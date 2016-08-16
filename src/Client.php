@@ -27,7 +27,7 @@ class Client implements ClientInterface
      *
      * @param string $apiKey
      *
-     * @return \sngrl\PhpFirebaseCloudMessaging\Client
+     * @return $this
      */
     public function setApiKey($apiKey)
     {
@@ -36,11 +36,11 @@ class Client implements ClientInterface
     }
 
     /**
-     * people can overwrite the api url with a proxy server url of their own
+     * Override the Firebase API URL with a custom (proxy server) URL
      *
      * @param string $url
      *
-     * @return \sngrl\PhpFirebaseCloudMessaging\Client
+     * @return $this
      */
     public function setProxyApiUrl($url)
     {
@@ -49,8 +49,7 @@ class Client implements ClientInterface
     }
 
     /**
-     * sends your notification to the google servers and returns a guzzle repsonse object
-     * containing their answer.
+     * Sends a message to the Firebase servers
      *
      * @param Message $message
      *
@@ -73,7 +72,7 @@ class Client implements ClientInterface
 
     /**
      * @param integer $topic_id
-     * @param array|string $recipients_tokens
+     * @param string|string[] $recipients_tokens
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -85,7 +84,7 @@ class Client implements ClientInterface
 
     /**
      * @param integer $topic_id
-     * @param array|string $recipients_tokens
+     * @param string|string[] $recipients_tokens
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -97,7 +96,7 @@ class Client implements ClientInterface
 
     /**
      * @param integer $topic_id
-     * @param array|string $recipients_tokens
+     * @param string|string[] $recipients_tokens
      * @param string $url
      *
      * @return \Psr\Http\Message\ResponseInterface

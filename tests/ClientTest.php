@@ -1,12 +1,10 @@
 <?php
 namespace sngrl\PhpFirebaseCloudMessaging\Tests;
 
-use sngrl\PhpFirebaseCloudMessaging\Client;
-use sngrl\PhpFirebaseCloudMessaging\Recipient\Topic;
-use sngrl\PhpFirebaseCloudMessaging\Message;
-
 use GuzzleHttp;
 use GuzzleHttp\Psr7\Response;
+use sngrl\PhpFirebaseCloudMessaging\Client;
+use sngrl\PhpFirebaseCloudMessaging\TopicMessage;
 
 class ClientTest extends PhpFirebaseCloudMessagingTestCase
 {
@@ -35,8 +33,8 @@ class ClientTest extends PhpFirebaseCloudMessagingTestCase
         $this->fixture->injectGuzzleHttpClient($guzzle);
         $this->fixture->setApiKey($apiKey);
 
-        $message = new Message();
-        $message->addRecipient(new Topic('test'));
+        $message = new TopicMessage();
+        $message->addTopic('test');
 
         $this->fixture->send($message);
     }

@@ -1,71 +1,71 @@
 <?php
+
 namespace sngrl\PhpFirebaseCloudMessaging\Tests;
 
-use sngrl\PhpFirebaseCloudMessaging\Recipient\Recipient;
-use sngrl\PhpFirebaseCloudMessaging\Message;
-use sngrl\PhpFirebaseCloudMessaging\Recipient\Topic;
+use sngrl\PhpFirebaseCloudMessaging\DeviceMessage;
 use sngrl\PhpFirebaseCloudMessaging\Notification;
-use sngrl\PhpFirebaseCloudMessaging\Recipient\Device;
+use sngrl\PhpFirebaseCloudMessaging\TopicMessage;
 
 class MessageTest extends PhpFirebaseCloudMessagingTestCase
 {
-    private $fixture;
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->fixture = new Message();
-    }
-
-    public function testThrowsExceptionWhenDifferentRecepientTypesAreRegistered()
-    {
-        $this->setExpectedException(\InvalidArgumentException::class);
-        $this->fixture->addRecipient(new Topic('breaking-news'))
-            ->addRecipient(new Recipient());
-    }
-
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testThrowsExceptionWhenNoRecepientWasAdded()
     {
-        $this->setExpectedException(\UnexpectedValueException::class);
-        $this->fixture->jsonSerialize();
+        $message = new DeviceMessage();
+        $message->jsonSerialize();
     }
 
+    /**
+     * The current API requires a format string to represent the logic for combining topics
+     *
+     * @expectedException \InvalidArgumentException
+     */
     public function testThrowsExceptionWhenMultipleTopicsWereGiven()
     {
-        $this->setExpectedException(\UnexpectedValueException::class);
-        $this->fixture->addRecipient(new Topic('breaking-news'))
-            ->addRecipient(new Topic('another topic'));
+        $message = new TopicMessage();
 
-        $this->fixture->jsonSerialize();
+        $message->addTopic('breaking-news');
+        $message->addTopic('another topic');
+
+        $message->jsonSerialize();
     }
 
-    public function testJsonEncodeWorksOnTopicRecipients()
+    public function testJsonEncodeWorksOnTopicMessages()
     {
-        $body = '{"to":"\/topics\/breaking-news","notification":{"title":"test","body":"a nice testing notification"}}';
+        $expected = [
+            'to' => '/topics/breaking-news',
+            'notification' => [
+                'title' => 'test',
+                'body' => 'a nice testing notification',
+            ],
+        ];
 
         $notification = new Notification('test', 'a nice testing notification');
-        $message = new Message();
-        $message->setNotification($notification);
 
-        $message->addRecipient(new Topic('breaking-news'));
-        $this->assertSame(
-            $body,
-            json_encode($message)
-        );
+        $message = new TopicMessage();
+        $message->setNotification($notification);
+        $message->addTopic('breaking-news');
+
+        $this->assertEquals($expected, json_decode(json_encode($message), true));
     }
 
     public function testJsonEncodeWorksOnDeviceRecipients()
     {
-        $body = '{"to":"deviceId","notification":{"title":"test","body":"a nice testing notification"}}';
+        $expected = [
+            'to' => 'deviceId',
+            'notification' => [
+                'title' => 'test',
+                'body' => 'a nice testing notification',
+            ],
+        ];
 
         $notification = new Notification('test', 'a nice testing notification');
-        $message = new Message();
+        $message = new DeviceMessage();
         $message->setNotification($notification);
 
-        $message->addRecipient(new Device('deviceId'));
-        $this->assertSame(
-            $body,
-            json_encode($message)
-        );
+        $message->addRecipient('deviceId');
+        $this->assertEquals($expected, json_decode(json_encode($message), true));
     }
 }

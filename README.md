@@ -1,29 +1,20 @@
 # PHP Firebase Cloud Messaging
-PHP API for Firebase Cloud Messaging from Google.
+
+PHP API for [Firebase Cloud Messaging from Google](https://firebase.google.com/docs/).
 
 Currently this app server library only supports sending Messages/Notifications via HTTP.
 
-See original Firebase docs: https://firebase.google.com/docs/
+# Setup
 
-#Setup
-Install via Composer:
 ```php
 composer require sngrl/php-firebase-cloud-messaging
 ```
 
-Or add this to your composer.json and run "composer update":
 
-```php
-"require": {
-    "sngrl/php-firebase-cloud-messaging": "dev-master"
-}
-```
-
-#Send message to Device
+# Send message to Device
 ```php
 use sngrl\PhpFirebaseCloudMessaging\Client;
-use sngrl\PhpFirebaseCloudMessaging\Message;
-use sngrl\PhpFirebaseCloudMessaging\Recipient\Device;
+use sngrl\PhpFirebaseCloudMessaging\DeviceMessage;
 use sngrl\PhpFirebaseCloudMessaging\Notification;
 
 $server_key = '_YOUR_SERVER_KEY_';
@@ -31,13 +22,12 @@ $client = new Client();
 $client->setApiKey($server_key);
 $client->injectGuzzleHttpClient(new \GuzzleHttp\Client());
 
-$message = new Message();
+$message = new DeviceMessage();
 $message->setPriority('high');
-$message->addRecipient(new Device('_YOUR_DEVICE_TOKEN_'));
+$message->addRecipient('_YOUR_DEVICE_TOKEN_');
 $message
     ->setNotification(new Notification('some title', 'some body'))
-    ->setData(['key' => 'value'])
-;
+    ->setData(['key' => 'value']);
 
 $response = $client->send($message);
 var_dump($response->getStatusCode());
@@ -47,24 +37,26 @@ var_dump($response->getBody()->getContents());
 #Send message to multiple Devices
 
 ```php
-...
-$message = new Message();
+$message = new DeviceMessage();
 $message->setPriority('high');
-$message->addRecipient(new Device('_YOUR_DEVICE_TOKEN_'));
-$message->addRecipient(new Device('_YOUR_DEVICE_TOKEN_2_'));
-$message->addRecipient(new Device('_YOUR_DEVICE_TOKEN_3_'));
+
+$message->addRecipient('_YOUR_DEVICE_TOKEN_');
+$message->addRecipient('_ANOTHER_DEVICE_TOKEN_');
+
+$message->addRecipients([
+    '_YOUR_DEVICE_TOKEN_2_',
+    '_YOUR_DEVICE_TOKEN_3_'
+]);
+
 $message
     ->setNotification(new Notification('some title', 'some body'))
-    ->setData(['key' => 'value'])
-;
-...
+    ->setData(['key' => 'value']);
 ```
 #Send message to Topic
 
 ```php
 use sngrl\PhpFirebaseCloudMessaging\Client;
-use sngrl\PhpFirebaseCloudMessaging\Message;
-use sngrl\PhpFirebaseCloudMessaging\Recipient\Topic;
+use sngrl\PhpFirebaseCloudMessaging\TopicMessage;
 use sngrl\PhpFirebaseCloudMessaging\Notification;
 
 $server_key = '_YOUR_SERVER_KEY_';
@@ -72,13 +64,12 @@ $client = new Client();
 $client->setApiKey($server_key);
 $client->injectGuzzleHttpClient(new \GuzzleHttp\Client());
 
-$message = new Message();
+$message = new TopicMessage();
 $message->setPriority('high');
-$message->addRecipient(new Topic('_YOUR_TOPIC_'));
+$message->addTopic('_YOUR_TOPIC_');
 $message
     ->setNotification(new Notification('some title', 'some body'))
-    ->setData(['key' => 'value'])
-;
+    ->setData(['key' => 'value']);
 
 $response = $client->send($message);
 var_dump($response->getStatusCode());
@@ -90,19 +81,17 @@ var_dump($response->getBody()->getContents());
 See Firebase documentation for sending to [combinations of multiple topics](https://firebase.google.com/docs/cloud-messaging/topic-messaging#sending_topic_messages_from_the_server).
 
 ```php
-...
-$message = new Message();
+$message = new TopicMessage();
 $message->setPriority('high');
-$message->addRecipient(new Topic('_YOUR_TOPIC_'));
-$message->addRecipient(new Topic('_YOUR_TOPIC_2_'));
-$message->addRecipient(new Topic('_YOUR_TOPIC_3_'));
+$message->addTopic('_YOUR_TOPIC_');
+$message->addTopic('_YOUR_TOPIC_2_');
+$message->addTopic('_YOUR_TOPIC_3_');
 $message
     ->setNotification(new Notification('some title', 'some body'))
     ->setData(['key' => 'value'])
     // Will send to devices subscribed to topic 1 AND topic 2 or 3
     ->setCondition('%s && (%s || %s)')
 ;
-...
 ```
 
 #Subscribe user to the topic

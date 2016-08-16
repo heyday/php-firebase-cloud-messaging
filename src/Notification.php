@@ -4,7 +4,7 @@ namespace sngrl\PhpFirebaseCloudMessaging;
 /**
  * @link https://firebase.google.com/docs/cloud-messaging/http-server-ref#notification-payload-support
  */
-class Notification extends Message
+class Notification implements \JsonSerializable
 {
     private $title;
     private $body;
@@ -17,7 +17,6 @@ class Notification extends Message
     {
         $this->title = $title;
         $this->body = $body;
-        parent::__construct();
     }
 
     public function setTitle($title)
