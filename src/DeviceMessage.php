@@ -23,11 +23,12 @@ class DeviceMessage extends Message
         return $this;
     }
 
-    public function addRecipients(array $topicNames)
+    public function addRecipients(array $deviceTokens)
     {
-        foreach ($topicNames as $topicName) {
-            $this->addRecipient($topicName);
+        foreach ($deviceTokens as $token) {
+            $this->addRecipient($token);
         }
+
         return $this;
     }
 
