@@ -8,6 +8,16 @@ namespace sngrl\PhpFirebaseCloudMessaging;
 class DeviceMessage extends Message
 {
     /**
+     * Switch between sending as multicast and sending to an individual device
+     *
+     * Always using multicast is the default as it makes the response format from
+     * Firebase independent of the number of recipients
+     *
+     * @var bool
+     */
+    protected $forceMulticast = true;
+
+    /**
      * Add a recipient device
      *
      * @param string $deviceToken
@@ -29,6 +39,15 @@ class DeviceMessage extends Message
             $this->addRecipient($token);
         }
 
+        return $this;
+    }
+
+    /**
+     * Send this notification as multi-cast, even if it only has one recipient.
+     */
+    public function sendAsMulticast($multicast = true)
+    {
+        $this->forceMulticast = $multicast;
         return $this;
     }
 
@@ -63,10 +82,13 @@ class DeviceMessage extends Message
 
         $data = parent::jsonSerialize();
 
-        if (count($this->recipients) > 1) {
+        if ($this->forceMulticast) {
             $data['registration_ids'] = $this->recipients;
-        } else {
+
+        } else if (count($this->recipients) == 1) {
             $data['to'] = reset($this->recipients);
+        } else {
+            throw new \RuntimeException("Can't use single-recipient messaging with more or less than one recipient. Use multi-cast.");
         }
 
         return $data;
