@@ -13,10 +13,15 @@ class Notification implements \JsonSerializable
     private $sound;
     private $clickAction;
 
-    public function __construct($title, $body)
+    public function __construct($title = null, $body = null)
     {
-        $this->title = $title;
-        $this->body = $body;
+        if (!is_null($title)) {
+            $this->title = $title;
+        }
+
+        if (!is_null($body)) {
+            $this->body = $body;
+        }
     }
 
     public function setTitle($title)
@@ -69,10 +74,14 @@ class Notification implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $jsonData = array(
-            'title' => $this->title,
-            'body' => $this->body
-        );
+        $jsonData = array();
+
+        if ($this->title) {
+            $jsonData['title'] = $this->title;
+        }
+        if ($this->body) {
+            $jsonData['body'] = $this->body;
+        }
         if ($this->badge) {
             $jsonData['badge'] = $this->badge;
         }
