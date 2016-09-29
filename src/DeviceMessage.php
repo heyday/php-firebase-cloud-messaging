@@ -33,6 +33,20 @@ class DeviceMessage extends Message
         return $this;
     }
 
+    /**
+     * Return the tokens
+     * @return array
+     */
+    public function getRecipients()
+    {
+        return $this->recipients;
+    }
+
+    /**
+     * Add multiple recipients
+     * @param array $deviceTokens
+     * @return $this
+     */
     public function addRecipients(array $deviceTokens)
     {
         foreach ($deviceTokens as $token) {
